@@ -1,4 +1,7 @@
+import tensorflow as tf
+from tensorflow import keras
 from keras._tf_keras.keras.models import model_from_json
+from keras._tf_keras.keras import models
 import cv2
 import numpy as np
 
@@ -6,8 +9,7 @@ json_file = open("signlanguagedetectionmodel48x48.json", "r")
 model_json = json_file.read()
 json_file.close()
 model = model_from_json(model_json)
-model.load_weights("signlanguagedetectionmodel48x48.h5")
-
+model.load_weights("signlanguagedetectionmodel48x48.h5")  
 def extract_features(image):
     feature = np.array(image)
     feature = feature.reshape(1,48,48,1)
@@ -16,13 +18,19 @@ def extract_features(image):
 cap = cv2.VideoCapture(0)
 label = ['A', 'B', 'C']
 while True:
-    _,frame = cap.read(0)
+    ret, frame = cap.read()  
+    
+    # Check if frame is successfully read
+    if not ret:
+        print("Error: Could not read frame. Check camera connection.")
+        break  # Exit the loop if frame is None
+
     cv2.rectangle(frame,(0,40),(300,300),(0, 165, 255),1)
     cropframe=frame[40:300,0:300]
     cropframe=cv2.cvtColor(cropframe,cv2.COLOR_BGR2GRAY)
     cropframe = cv2.resize(cropframe,(48,48))
     cropframe = extract_features(cropframe)
-    pred = model.predict(cropframe) 
+    pred = models.Model.predict(cropframe) 
     prediction_label = label[pred.argmax()]
     cv2.rectangle(frame, (0,0), (300, 40), (0, 165, 255), -1)
     if prediction_label == 'blank':
