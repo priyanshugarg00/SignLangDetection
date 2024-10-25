@@ -22,7 +22,7 @@ for i in range(65,91):
 
 
 import os
-import cv2
+#import cv2
 cap=cv2.VideoCapture(0)
 while True:
     _,frame=cap.read()
